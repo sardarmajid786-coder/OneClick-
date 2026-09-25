@@ -1,53 +1,21 @@
-const sampleShops = [
-  {name:'Nowshera Grocery',category:'Grocery',address:'Nowshera',delivery_area:'Local delivery',delivery_fee:0},
-  {name:'Pindi Gheb Bakers',category:'Bakery',address:'Pindi Gheb',delivery_area:'Local delivery',delivery_fee:0},
-  {name:'City General Store',category:'General Store',address:'Pindi Gheb',delivery_area:'Local delivery',delivery_fee:0},
-  {name:'Nowshera Fresh Mart',category:'Grocery',address:'Nowshera',delivery_area:'Local delivery',delivery_fee:0},
-  {name:'Health Care Pharmacy',category:'Pharmacy',address:'Pindi Gheb',delivery_area:'Local delivery',delivery_fee:0},
-  {name:'Village Dry Foods',category:'General Store',address:'Nowshera',delivery_area:'Local delivery',delivery_fee:0}
-];
-
-let shops = [];
-let supabaseClient = null;
-try {
-  supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_PUBLISHABLE_KEY);
-} catch (e) { console.warn('Supabase init failed', e); }
-
-function renderShops(list){
-  const grid=document.getElementById('grid');
-  if(!grid)return;
-  grid.innerHTML=list.map((s,i)=>`<article class="shop"><div class="shop-icon">${['🛒','🥖','🏪','🥬','💊','🌶️'][i%6]}</div><div><span>${s.category||'Local shop'}</span><h3>${escapeHtml(s.name)}</h3><p>${escapeHtml(s.address||'Pilot area')} · ${escapeHtml(s.delivery_area||'Local delivery')}</p><button class="secondary" onclick="viewShop('${s.id||''}')">View Shop</button></div></article>`).join('');
-}
-function escapeHtml(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
-async function loadShops(){
-  if(!supabaseClient){shops=sampleShops;renderShops(shops);return;}
-  const {data,error}=await supabaseClient.from('shops').select('id,name,category,address,delivery_area,delivery_fee,is_approved,is_open').eq('is_approved',true).order('name');
-  if(error){console.warn('Supabase shops query failed:',error);shops=sampleShops;renderShops(shops);return;}
-  shops=(data&&data.length)?data:sampleShops;
-  renderShops(shops);
-}
-async function viewShop(id){
-  if(!id){alert('Sample shop preview. Live shop pages will open after merchants are added.');return;}
-  const shop=shops.find(s=>s.id===id);
-  if(!shop)return;
-  let msg=`${shop.name}\n${shop.category||''}\n${shop.address||''}`;
-  try{
-    const {data,error}=await supabaseClient.from('products').select('name,price,description').eq('shop_id',id).eq('available',true).order('name');
-    if(!error && data?.length){msg+='\n\nProducts:\n'+data.map(p=>`${p.name} — Rs.${p.price}`).join('\n');}
-  }catch(e){}
-  alert(msg);
-}
-function filter(){
-  const q=(document.getElementById('q')?.value||'').toLowerCase();
-  const cat=document.getElementById('cat')?.value||'';
-  renderShops(shops.filter(s=>(!q || `${s.name} ${s.category} ${s.address}`.toLowerCase().includes(q)) && (!cat || s.category===cat)));
-}
-
-const modal=document.getElementById('modal');
-document.getElementById('login')?.addEventListener('click',()=>modal?.classList.remove('hidden'));
-document.getElementById('vendorLogin')?.addEventListener('click',()=>modal?.classList.remove('hidden'));
-document.getElementById('close')?.addEventListener('click',()=>modal?.classList.add('hidden'));
-document.getElementById('q')?.addEventListener('input',filter);
-document.getElementById('cat')?.addEventListener('change',filter);
-document.getElementById('lang')?.addEventListener('click',()=>alert('Urdu/English bilingual interface will be connected in the next UI pass.'));
-loadShops();
+const sampleShops=[{id:'',name:'Nowshera Grocery',category:'Grocery',address:'Nowshera',delivery_area:'Local delivery',delivery_fee:0},{id:'',name:'Pindi Gheb Bakers',category:'Bakery',address:'Pindi Gheb',delivery_area:'Local delivery',delivery_fee:0},{id:'',name:'City General Store',category:'General Store',address:'Pindi Gheb',delivery_area:'Local delivery',delivery_fee:0},{id:'',name:'Nowshera Fresh Mart',category:'Grocery',address:'Nowshera',delivery_area:'Local delivery',delivery_fee:0},{id:'',name:'Health Care Pharmacy',category:'Pharmacy',address:'Pindi Gheb',delivery_area:'Local delivery',delivery_fee:0},{id:'',name:'Village Dry Foods',category:'General Store',address:'Nowshera',delivery_area:'Local delivery',delivery_fee:0}];
+let db=null,shops=[],lang='en',currentUser=null,cart=[];
+const $=s=>document.querySelector(s); const esc=v=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.remove('hidden');setTimeout(()=>t.classList.add('hidden'),2600)}
+try{db=window.supabase.createClient(window.SUPABASE_URL,window.SUPABASE_PUBLISHABLE_KEY)}catch(e){console.warn(e)}
+const T={en:{shops:'Shops',how:'How it works',vendor:'For Vendors',login:'Login',local:'LOCAL MARKETPLACE',heroTitle:'Your local shops, one click away.',heroText:'Find approved local shops, browse products and place an order directly with the merchant.',browse:'Browse Shops',join:'Join as Vendor',search:'Search shops or products',localShops:'LOCAL SHOPS',explore:'Explore local shops',all:'All categories',simple:'Simple for everyone',choose:'Choose a shop',chooseText:'Open an approved local merchant and browse products.',order:'Place your order',orderText:'Add items, confirm your address and submit.',delivery:'Merchant delivers',deliveryText:'Payment goes directly to the merchant during the pilot.',forVendors:'FOR LOCAL VENDORS',vendorTitle:'Bring your shop online with OnClick.',vendorText:'Create a vendor account, manage products and receive local orders.',vendorLogin:'Vendor Login'},ur:{shops:'دکانیں',how:'طریقہ کار',vendor:'دکاندار',login:'لاگ اِن',local:'مقامی مارکیٹ پلیس',heroTitle:'آپ کی مقامی دکانیں، ایک کلک پر۔',heroText:'منظور شدہ مقامی دکانیں دیکھیں، مصنوعات منتخب کریں اور دکاندار کو آرڈر دیں۔',browse:'دکانیں دیکھیں',join:'بطور دکاندار شامل ہوں',search:'دکان یا چیز تلاش کریں',localShops:'مقامی دکانیں',explore:'مقامی دکانیں دیکھیں',all:'تمام کیٹیگریز',simple:'سب کے لیے آسان',choose:'دکان منتخب کریں',chooseText:'منظور شدہ دکان کھولیں اور مصنوعات دیکھیں۔',order:'آرڈر دیں',orderText:'اشیاء شامل کریں، پتہ دیں اور آرڈر بھیجیں۔',delivery:'دکاندار ڈیلیور کرے گا',deliveryText:'پائلٹ میں ادائیگی براہ راست دکاندار کو ہوگی۔',forVendors:'مقامی دکانداروں کے لیے',vendorTitle:'اپنی دکان OnClick پر لائیں۔',vendorText:'دکاندار اکاؤنٹ بنائیں، مصنوعات سنبھالیں اور آرڈرز وصول کریں۔',vendorLogin:'دکاندار لاگ اِن'}};
+function applyLang(){document.documentElement.lang=lang;document.querySelectorAll('[data-i18n]').forEach(e=>e.textContent=T[lang][e.dataset.i18n]||e.textContent);document.querySelectorAll('[data-i18n-placeholder]').forEach(e=>e.placeholder=lang==='ur'?'دکانیں تلاش کریں...':'Search shops...');$('#lang').textContent=lang==='en'?'اردو':'English'}
+async function load(){if(!db){shops=sampleShops;render();return}const {data,error}=await db.from('shops').select('id,name,category,address,delivery_area,delivery_fee,is_approved,is_open').eq('is_approved',true).order('name');if(error){console.warn(error);shops=sampleShops}else shops=data?.length?data:sampleShops;render()}
+function render(){const q=($('#q')?.value||'').toLowerCase(),cat=$('#cat')?.value||'';const list=shops.filter(s=>(!q||`${s.name} ${s.category} ${s.address}`.toLowerCase().includes(q))&&(!cat||s.category===cat));$('#grid').innerHTML=list.map((s,i)=>`<article class="card"><div class="icon">${['🛒','🥖','🏪','🥬','💊','🌶️'][i%6]}</div><h3>${esc(s.name)}</h3><span class="status">${esc(s.category||'Local shop')}</span><p>${esc(s.address||'Pilot area')} · ${esc(s.delivery_area||'Local delivery')}</p><button class="secondary" onclick="openShop('${esc(s.id)}')">View Shop</button></article>`).join('')||'<p>No shops found.</p>'}
+async function openShop(id){if(!id){toast('This is a demo shop. Add a real approved shop in Supabase to open products.');return}const s=shops.find(x=>x.id===id);let products=[];const r=await db.from('products').select('id,name,description,price,available').eq('shop_id',id).eq('available',true).order('name');if(!r.error)products=r.data||[];showModal(`<h2>${esc(s.name)}</h2><p>${esc(s.address||'')} · Delivery Rs.${Number(s.delivery_fee||0)}</p><div class="shop-products">${products.length?products.map(p=>`<div class="product-row"><div><b>${esc(p.name)}</b><small>${esc(p.description||'')}</small></div><b>Rs.${Number(p.price).toLocaleString()}</b><button class="primary" onclick="addCart('${esc(p.id)}','${esc(s.id)}','${esc(p.name)}',${Number(p.price)})">Add</button></div>`).join(''):'<p>No available products yet.</p>'}</div><div id="cartArea"></div>`)}
+function addCart(pid,sid,name,price){if(cart.length&&cart[0].shopId!==sid){toast('Cart can contain one shop at a time.');return}const x=cart.find(i=>i.id===pid);if(x)x.qty++;else cart.push({id:pid,shopId:sid,name,price,qty:1});renderCart();toast('Added to cart')}
+function renderCart(){const a=$('#cartArea');if(!a)return;const sub=cart.reduce((n,x)=>n+x.price*x.qty,0);a.innerHTML=cart.length?`<div class="cartbar"><span>${cart.reduce((n,x)=>n+x.qty,0)} items · Rs.${sub.toLocaleString()}</span><button class="primary" onclick="checkout()">Checkout</button></div>`:''}
+async function checkout(){if(!db){toast('Supabase is not available');return}if(subtotal()<500){toast('Minimum order is Rs.500');return}const s=shops.find(x=>x.id===cart[0].shopId);if(!currentUser){authModal('login');return}showModal(`<h2>Checkout</h2><p>Minimum order Rs.500 · Payment directly to merchant</p><input id="cname" placeholder="Your name"><input id="cphone" placeholder="Phone"><textarea id="caddr" placeholder="Delivery address"></textarea><button class="primary" onclick="placeOrder('${s.id}',${Number(s.delivery_fee||0)})">Place order</button>`) }
+function subtotal(){return cart.reduce((n,x)=>n+x.price*x.qty,0)}
+async function placeOrder(shopId,deliveryFee){const name=$('#cname').value.trim(),phone=$('#cphone').value.trim(),addr=$('#caddr').value.trim();if(!name||!phone||!addr){toast('Please fill all checkout fields');return}const sub=subtotal(),comm=Math.round(sub*0.05*100)/100,total=sub+Number(deliveryFee||0);const payload={customer_id:currentUser.id,shop_id:shopId,order_source:'Website',customer_name:name,customer_phone:phone,delivery_address:addr,product_subtotal:sub,delivery_fee:Number(deliveryFee||0),commission_rate:0.05,commission_amount:comm,customer_total:total,payment_method:'Merchant Direct'};const {data,error}=await db.from('orders').insert(payload).select('id').single();if(error){toast('Order failed: '+error.message);return}cart=[];showModal(`<h2>Order received</h2><p>Your order has been sent to the merchant.</p><p>Order ID: ${esc(data.id)}</p><button class="primary" onclick="closeModal()">Done</button>`)}
+function showModal(html){$('#authView').innerHTML=html;$('#modal').classList.remove('hidden')}function closeModal(){$('#modal').classList.add('hidden')}
+function authModal(mode='login'){showModal(`<div class="tabs"><button class="secondary" onclick="authModal('login')">Login</button><button class="secondary" onclick="authModal('signup')">Create account</button></div><h2>${mode==='login'?'Login':'Create account'}</h2>${mode==='signup'?'<input id="full" placeholder="Full name"><input id="phone" placeholder="Phone"><select id="role"><option value="customer">Customer</option><option value="vendor">Vendor</option></select>':''}<input id="email" type="email" placeholder="Email"><input id="pass" type="password" placeholder="Password"><button class="primary" onclick="${mode==='login'?'login()':'signup()'}">Continue</button>`)}
+async function signup(){const email=$('#email').value.trim(),pass=$('#pass').value,role=$('#role').value,full=$('#full').value.trim(),phone=$('#phone').value.trim();const {error}=await db.auth.signUp({email,password:pass,options:{data:{full_name:full,phone,role}}});if(error)toast(error.message);else{toast('Account created. Check your email if confirmation is enabled.');authModal('login')}}
+async function login(){const {data,error}=await db.auth.signInWithPassword({email:$('#email').value.trim(),password:$('#pass').value});if(error)toast(error.message);else{currentUser=data.user;closeModal();toast('Logged in')}}
+async function session(){if(!db)return;const {data}=await db.auth.getSession();currentUser=data.session?.user||null}
+$('#q').addEventListener('input',render);$('#cat').addEventListener('change',render);$('#lang').addEventListener('click',()=>{lang=lang==='en'?'ur':'en';applyLang()});$('#authBtn').addEventListener('click',()=>currentUser?showModal(`<h2>Account</h2><p>${esc(currentUser.email)}</p><button class="secondary" onclick="db.auth.signOut().then(()=>{currentUser=null;closeModal();toast('Logged out')})">Logout</button>`):authModal('login'));$('#vendorBtn').addEventListener('click',()=>authModal('signup'));$('#close').addEventListener('click',closeModal);applyLang();session();load();

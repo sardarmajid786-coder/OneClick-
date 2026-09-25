@@ -1,15 +1,24 @@
-# OnClick — Supabase-connected starter
+# OnClick — live Supabase MVP starter
 
-This package uses the Supabase Project URL and browser-safe Publishable key supplied by the project owner.
+This version is designed for GitHub Pages + Supabase.
 
-It can:
-- load approved shops from `shops` when data exists;
-- load available products when a live shop is opened;
-- fall back to sample pilot shops when tables are empty;
-- keep the existing responsive OnClick design.
+## Included
+- Live approved shops from `shops`
+- Live available products from `products`
+- Customer/vendor email-password signup/login via Supabase Auth
+- Vendor role captured at signup
+- Cart and checkout
+- Rs.500 minimum order
+- 5% commission on product subtotal only
+- Merchant-direct payment during pilot
+- Merchant delivery fee from the shop
+- Basic Urdu/English UI toggle
 
-Security:
-- Only the Supabase Publishable key is included in browser code.
-- Never put a Supabase Secret/service_role key in HTML, JavaScript, or GitHub.
+## One-time Supabase step
+Run `setup.sql` in Supabase SQL Editor. It creates the Auth -> profiles trigger and tightens order-item/vendor order policies.
 
-Current backend policies still need the final customer/vendor Auth and order workflow before this is a production ordering site.
+## Important
+Only the Supabase Publishable key is in `supabase-config.js`. Never put the Secret/service_role key in the browser or GitHub.
+
+## Admin
+After creating your own account, get your Auth user UUID from Supabase Authentication and set that profile to admin using the commented SQL in `setup.sql`. Admin dashboard UI can then be added as the next phase.
