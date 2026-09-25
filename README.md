@@ -1,24 +1,35 @@
-# OnClick — live Supabase MVP starter
+# OnClick — Final MVP package
 
-This version is designed for GitHub Pages + Supabase.
+This package is the consolidated OnClick website + Supabase MVP setup.
 
 ## Included
-- Live approved shops from `shops`
-- Live available products from `products`
-- Customer/vendor email-password signup/login via Supabase Auth
-- Vendor role captured at signup
-- Cart and checkout
-- Rs.500 minimum order
-- 5% commission on product subtotal only
-- Merchant-direct payment during pilot
-- Merchant delivery fee from the shop
-- Basic Urdu/English UI toggle
+- Customer, Vendor and Admin roles
+- Admin-only shop approval/rejection
+- Customer/Vendor warning, suspension, ban and reactivation controls
+- Audit history for moderation and important record changes
+- Backend role/RLS protection (not just hidden buttons)
+- Product catalog, cart and checkout
+- Rs.500 minimum product subtotal
+- 5% OnClick commission on product subtotal only; delivery excluded
+- Merchant-direct payment during pilot; no gateway/COD infrastructure
+- Merchant-arranged delivery with vendor delivery area/fee/hours
+- Website and phone/manual order source support
+- Order status flow and cancellation reason
+- Pilot zone: Nowshera village + Pindi Gheb city
+- English-first UI with Urdu-ready structure
 
-## One-time Supabase step
-Run `setup.sql` in Supabase SQL Editor. It creates the Auth -> profiles trigger and tightens order-item/vendor order policies.
+## One-time setup
+1. Replace the old website files in the GitHub repository with these package files.
+2. Run the complete `setup.sql` once in Supabase SQL Editor.
+3. Create/login to your own website account.
+4. In Supabase Authentication > Users, copy your UUID.
+5. In SQL Editor run:
+   `update public.profiles set role='admin' where id='YOUR-AUTH-USER-UUID';`
 
-## Important
-Only the Supabase Publishable key is in `supabase-config.js`. Never put the Secret/service_role key in the browser or GitHub.
+## Security
+Use only the publishable key in `supabase-config.js`.
+Never put a Supabase Secret/service_role key in GitHub or browser code.
+Because a Secret key was previously exposed during setup, rotate/revoke that old secret in Supabase before final launch.
 
-## Admin
-After creating your own account, get your Auth user UUID from Supabase Authentication and set that profile to admin using the commented SQL in `setup.sql`. Admin dashboard UI can then be added as the next phase.
+## Deferred features (not MVP)
+Rider network, live rider tracking, riders selling goods, representative-managed sellers without phones, large logistics and local-services marketplace remain future phases.
