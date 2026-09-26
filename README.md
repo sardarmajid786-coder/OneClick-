@@ -1,35 +1,32 @@
-# OnClick — Final MVP package
+# OnClick Phase-1 — Clean Trial Website
 
-This package is the consolidated OnClick website + Supabase MVP setup.
+This package replaces the mixed login flow with separate Customer, Vendor and Admin pages.
 
-## Included
-- Customer, Vendor and Admin roles
-- Admin-only shop approval/rejection
-- Customer/Vendor warning, suspension, ban and reactivation controls
-- Audit history for moderation and important record changes
-- Backend role/RLS protection (not just hidden buttons)
-- Product catalog, cart and checkout
-- Rs.500 minimum product subtotal
-- 5% OnClick commission on product subtotal only; delivery excluded
-- Merchant-direct payment during pilot; no gateway/COD infrastructure
-- Merchant-arranged delivery with vendor delivery area/fee/hours
-- Website and phone/manual order source support
-- Order status flow and cancellation reason
-- Pilot zone: Nowshera village + Pindi Gheb city
-- English-first UI with Urdu-ready structure
+## Pages
+- `index.html` — public landing page only; no shops/products shown.
+- `customer-login.html` / `customer-signup.html`
+- `vendor-login.html` / `vendor-signup.html`
+- `admin-login.html` — separate private admin login.
+- `customer.html` — local approved shops, product search/comparison and ordering.
+- `vendor.html` — create shop and add products.
+- `admin.html` — customer/vendor moderation, shop approval/suspension, orders and audit history.
 
-## One-time setup
-1. Replace the old website files in the GitHub repository with these package files.
-2. Run the complete `setup.sql` once in Supabase SQL Editor.
-3. Create/login to your own website account.
-4. In Supabase Authentication > Users, copy your UUID.
-5. In SQL Editor run:
-   `update public.profiles set role='admin' where id='YOUR-AUTH-USER-UUID';`
+## Supabase
+1. Run `setup.sql` in the Supabase SQL Editor.
+2. Create the Admin account in Supabase Authentication > Users.
+3. Copy the Admin user's UUID and run the update statement at the bottom of `setup.sql`.
+4. Never put a Supabase secret/service-role key in this website or GitHub.
 
-## Security
-Use only the publishable key in `supabase-config.js`.
-Never put a Supabase Secret/service_role key in GitHub or browser code.
-Because a Secret key was previously exposed during setup, rotate/revoke that old secret in Supabase before final launch.
+## Trial rules included
+- Vendor accounts are pending until Admin action.
+- Shops are pending until Admin approval.
+- Only approved + open shops appear to customers.
+- Customer area and shop service area are matched by text for the first trial.
+- Minimum order: Rs. 500.
+- OnClick commission: 5% of product subtotal, excluding delivery.
+- Customer pays merchant directly during the pilot.
+- Merchant handles delivery.
+- Product fields: name, category, description, regular price, sale price, available/out of stock, optional image URL.
 
-## Deferred features (not MVP)
-Rider network, live rider tracking, riders selling goods, representative-managed sellers without phones, large logistics and local-services marketplace remain future phases.
+## Important
+This is the clean Phase-1 code package. It is not automatically deployed to GitHub Pages. Upload/replace the files in the GitHub repository before testing the live website.
