@@ -10,7 +10,49 @@ async function ensureProfile(){ const {data,error}=await db.rpc('ensure_my_profi
 async function guard(role){ let p=await profile(); if(!p){ await ensureProfile(); p=await profile(); } if(!p){location.href='index.html';return null;} if(role && p.role!==role){await db.auth.signOut();location.href='index.html';return null;} if(p.account_status!=='active'){msg('Your account is pending approval or suspended. Please wait for Admin approval.','error');await db.auth.signOut();return null;} return p; }
 async function logout(){await db.auth.signOut();location.href='index.html';}
 function header(title){document.body.insertAdjacentHTML('afterbegin',`<header><a class="logo" href="index.html">OnClick</a><strong>${esc(title)}</strong><button class="btn small secondary" onclick="logout()">Logout</button></header>`);}
-async function login(role){const email=$('#email').value.trim(),password=$('#password').value;if(!email||!password)return msg('Enter email and password.','error');msg('Signing in...');const {error}=await db.auth.signInWithPassword({email,password});if(error)return msg(error.message,'error');await ensureProfile();const p=await profile();if(!p){await db.auth.signOut();return msg('Profile could not be created. Please run the latest setup.sql.','error');}if(p.role!==role){await db.auth.signOut();return msg(`This account is registered as ${p.role}, not ${role}.`,'error');}if(p.account_status!=='active'){await db.auth.signOut();return msg('Your account is pending Admin approval.','error');}location.href=role==='customer'?'customer.html':role==='vendor'?'vendor.html':'admin.html';}
+async function login(role){
+  const email=$('#email').value.trim(),password=$('#password').value;
+  if(!email||!password)return msg('Enter email and password.','error');
+  msg('Signing in...');
+  const {error}=await db.auth.signInWithPassword({email,password});
+  if(error)return msg(error.message,'error');
+
+  // Admin accounts are created/approved in Supabase. Never try to create
+  // an Admin profile during Admin Login.
+  let p=await profile();
+  if(!p && role!=='admin'){
+    await ensureProfile();
+    p=await profile();
+  }
+
+  if(!p){
+    await db.auth.signOut();
+    return msg('Profile not found for this account. Please contact Admin.','error');
+  }
+
+  if(role==='admin'){
+    if(p.role!=='admin'){
+      await db.auth.signOut();
+      return msg('Admin access denied. This account is not an Admin.','error');
+    }
+    if(p.account_status!=='active'){
+      await db.auth.signOut();
+      return msg('This Admin account is not active.','error');
+    }
+    location.href='admin.html';
+    return;
+  }
+
+  if(p.role!==role){
+    await db.auth.signOut();
+    return msg(`This account is registered as ${p.role}, not ${role}.`,'error');
+  }
+  if(p.account_status!=='active'){
+    await db.auth.signOut();
+    return msg('Your account is pending Admin approval.','error');
+  }
+  location.href=role==='customer'?'customer.html':'vendor.html';
+}
 async function signup(role){const email=$('#email').value.trim(),password=$('#password').value,name=$('#name').value.trim(),phone=$('#phone').value.trim(),area=$('#area').value.trim();if(!email||!password||!name)return msg('Name, email and password are required.','error');if(password.length<6)return msg('Password must be at least 6 characters.','error');const {data,error}=await db.auth.signUp({email,password,options:{data:{signup_role:role,full_name:name,phone,service_area:area}}});if(error)return msg(error.message,'error');msg('Account created. Admin approval is required before login. If email confirmation is enabled, confirm your email first.','success');}
 async function firstAdminSetup(){const email=$('#email').value.trim(),password=$('#password').value,name=$('#name')?.value.trim()||'Master Admin',phone=$('#phone')?.value.trim()||'';if(!email||!password)return msg('Enter your existing Admin email and password.','error');msg('Checking your account...');let {error}=await db.auth.signInWithPassword({email,password});if(error)return msg(error.message,'error');const {data,error:e}=await db.rpc('bootstrap_first_admin',{master_email:MASTER_ADMIN_EMAIL,full_name:name,phone});if(e){await db.auth.signOut();return msg(e.message,'error');}msg('First Admin activated successfully. Opening Admin Dashboard...','success');setTimeout(()=>location.href='admin.html',500);}
 async function requestAdminRole(){const reason=$('#reason').value.trim();if(!reason)return msg('Reason is required.','error');const {error}=await db.rpc('request_admin_role',{reason});if(error)return msg(error.message,'error');msg('Admin Team request submitted. Only the Master Admin can approve it.','success');}
