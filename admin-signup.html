@@ -1,1 +1,21 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>OnClick First Admin Setup</title><link rel="stylesheet" href="style.css"></head><body><main><div class="card form"><h2>First Admin Setup</h2><p class="muted">This is a one-time setup for the Master Admin. It is not a public Admin signup.</p><div id="msg"></div><label>Name</label><input id="name" value="Master Admin"><label>Phone</label><input id="phone"><label>Admin Email</label><input id="email" type="email" value="sardarmajid786@gmail.com"><label>Password</label><input id="password" type="password"><button class="btn topgap" onclick="firstAdminSetup()">Activate First Admin</button><p class="muted topgap">After the first Admin is active, this setup cannot create another Admin. Future team members must be approved from the Admin Dashboard.</p></div></main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="app.js"></script></body></html>
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OnClick Admin</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+<div id="msg"></div>
+<h2 id="welcome"></h2>
+<div id="adminArea"></div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="app.js"></script>
+<script>loadAdmin()</script>
+</body>
+</html>
