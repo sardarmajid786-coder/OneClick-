@@ -1,1 +1,10 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>OnClick Admin</title><link rel="stylesheet" href="style.css"></head><body><main><div id="msg"></div><h2 id="welcome"></h2><div id="adminArea"></div></main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="app.js"></script><script>loadAdmin()</script></body></html>
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OnClick — Admin Control Center</title><link rel="stylesheet" href="style.css"></head>
+<body><main>
+<div id="msg"></div>
+<div class="dashboard-head"><div><div class="eyebrow">PRIVATE CONTROL CENTER</div><h1 id="welcome">Admin Dashboard</h1><p class="muted">Full oversight of customers, vendors, shops, products, orders and audit history.</p></div><div class="actions"><a class="btn secondary" href="index.html">Public site</a><button class="btn" onclick="logout()">Logout</button></div></div>
+<div class="card" style="margin-bottom:18px"><b>Admin controls</b><span class="muted"> Approvals are for new vendor/shop access. Routine vendor product changes do not require Admin approval.</span></div>
+<div id="adminArea"></div>
+</main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="app.js"></script><script>loadAdmin()</script>
+</body></html>

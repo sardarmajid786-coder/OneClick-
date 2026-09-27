@@ -1,9 +1,18 @@
-OnClick FINAL CLEAN PACKAGE
+ONCLICK FINAL V3 UPLOAD
 
-Upload all files in this folder to the root of the new OneClick- GitHub repository.
-Do not upload this README if you do not want it; it is only instructions.
+1. Extract this ZIP.
+2. In the GitHub OneClick- repository, upload/replace ALL files in the repository root.
+3. Commit the changes to the main branch.
+4. Keep GitHub Pages set to:
+   Source = Deploy from a branch
+   Branch = main
+   Folder = / (root)
+5. Wait for Pages deployment.
 
-Important:
-- Keep all HTML, app.js, style.css, supabase-config.js, and setup.sql in the repository root.
-- Supabase data is separate from GitHub and is not deleted when the GitHub repository is deleted.
-- After upload, enable GitHub Pages from Settings > Pages > Deploy from branch > main / root.
+Public:
+https://sardarmajid786-coder.github.io/OneClick-/
+
+Admin:
+https://sardarmajid786-coder.github.io/OneClick-/admin-login.html
+
+Do NOT upload a Supabase secret/service-role key.

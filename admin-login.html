@@ -1,1 +1,13 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>OnClick Admin Login</title><link rel="stylesheet" href="style.css"></head><body><main><div class="card form"><h2>Admin Login</h2><p class="muted">Private administration area.</p><div id="msg"></div><label>Email</label><input id="email" type="email" value="sardarmajid786@gmail.com"><label>Password</label><input id="password" type="password"><button class="btn topgap" onclick="login('admin')">Admin Login</button><p class="muted topgap">First time setup? <a href="admin-signup.html">Open First Admin Setup</a></p></div></main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="app.js"></script></body></html>
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OnClick — Private Admin Login</title><link rel="stylesheet" href="style.css"></head>
+<body><main><div class="form-shell">
+<div class="brandline"><a class="logo" href="index.html">OnClick</a><span>PRIVATE ADMIN PORTAL</span></div>
+<div class="card form"><div class="eyebrow">AUTHORIZED ACCESS ONLY</div><h1>Admin Login</h1>
+<p class="muted">This is a separate control portal. There is no public Admin signup.</p>
+<div id="msg"></div><label>Email</label><input id="email" type="email" value="sardarmajid786@gmail.com">
+<label>Password</label><input id="password" type="password" autocomplete="current-password">
+<button class="btn topgap" onclick="login('admin')">Enter Admin Dashboard</button>
+<p class="muted topgap">Admin URL: <b>/admin-login.html</b></p></div></div></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="app.js"></script>
+</body></html>

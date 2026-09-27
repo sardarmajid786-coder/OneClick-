@@ -1,1 +1,8 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Vendor Dashboard</title><link rel="stylesheet" href="style.css"></head><body><main><div id="msg"></div><h2 id="welcome"></h2><div id="vendorArea"></div></main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="app.js"></script><script>loadVendor()</script></body></html>
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OnClick — Vendor</title><link rel="stylesheet" href="style.css"></head>
+<body><main><div id="msg"></div>
+<div class="dashboard-head"><div><div class="eyebrow">VENDOR CONTROL PANEL</div><h1 id="welcome"></h1><p class="muted">You control your shop and routine product changes. Initial shop approval remains an Admin decision.</p></div><button class="btn secondary" onclick="logout()">Logout</button></div>
+<div id="vendorArea"></div></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="app.js"></script><script>loadVendor()</script>
+</body></html>
